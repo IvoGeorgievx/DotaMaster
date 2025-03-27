@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { HeroesModule } from './heroes/heroes.module';
 import { ScheduleModule } from '@nestjs/schedule';
+import { ItemPopularityModule } from './item-popularity/item-popularity.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     }),
     ScheduleModule.forRoot(),
     HeroesModule,
+    ItemPopularityModule,
   ],
   controllers: [AppController],
   providers: [AppService],

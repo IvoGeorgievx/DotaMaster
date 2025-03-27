@@ -8,6 +8,9 @@ export class Hero {
   @Column()
   name: string;
 
+  @Column({ nullable: true })
+  winRate: number;
+
   @Column()
   localizedName: string;
 

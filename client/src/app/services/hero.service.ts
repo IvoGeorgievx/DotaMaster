@@ -11,7 +11,6 @@ export class HeroService {
   constructor(private readonly http: HttpClient) {}
 
   getHeroes(): Observable<Hero[]> {
-    console.log('called');
     return this.http.get<Hero[]>(`${this.apiUrl}/heroes`);
   }
 }

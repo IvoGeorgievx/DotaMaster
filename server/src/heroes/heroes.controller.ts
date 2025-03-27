@@ -8,12 +8,21 @@ export class HeroesController {
 
   @Get()
   getHeroesFromDb(): Promise<Hero[]> {
-    console.log('something');
     return this.heroesService.getHeroesFromDb();
+  }
+
+  @Post('seed')
+  getHeroesFromApi(): Promise<any> {
+    return this.heroesService.getHeroesFromTheApi();
   }
 
   @Post('clear')
   clearAllHeroes(): Promise<void> {
     return this.heroesService.clearAllHeroes();
+  }
+
+  @Get('stats')
+  getHeroesStats(): Promise<any> {
+    return this.heroesService.getHeroesStats();
   }
 }
