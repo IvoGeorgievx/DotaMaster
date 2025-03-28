@@ -1,22 +1,5 @@
-<ag-grid-angular class="ag-theme-alpine" style="height: 600px; width: 100%;" [columnDefs]="colDefs" [rowData]="rowData"
-  domLayout="autoHeight">
+<ag-grid-angular class="ag-theme-alpine" style="height: auto; width: 100%" [columnDefs]="colDefs" [rowData]="rowData"
+  domLayout="autoHeight" [pagination]="pagination" [paginationPageSize]="paginationPageSize"
+  [paginationPageSizeSelector]="paginationPageSizeSelector">
+  [defaultColDef]="defaultColDef">
 </ag-grid-angular>
-
-<!-- ...rest of your template... -->
-
-<!-- <div>
-  @for (item of itemPopularity$ | async ; track $index) {
-  {{ item.hero.localizedName }}
-
-  @for (entry of getItemEntries(item.startGameItems); track entry.key) {
-  <h3>Starting items</h3>
-  item id: {{ entry.key }} item name:{{ entry.item.dname }} - count :
-  {{ entry.value }} item img:
-  <img src="{{ this.imgUrl + entry.item.img }}" alt="test" />
-  } @for (entry of getItemEntries(item.earlyGameItems); track entry.key) {
-  <h3>Early items</h3>
-  item id: {{ entry.key }} item name:{{ entry.item.dname }} - count :
-  {{ entry.value }} item img:
-  <img src="{{ this.imgUrl + entry.item.img }}" alt="test" />
-  } }
-</div> -->

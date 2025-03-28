@@ -8,7 +8,7 @@ export class Hero {
   @Column()
   name: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'float', nullable: true })
   winRate: number;
 
   @Column()

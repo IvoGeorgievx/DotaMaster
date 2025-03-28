@@ -1,7 +1,6 @@
-import { AsyncPipe } from '@angular/common';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { AgGridAngular } from 'ag-grid-angular';
-import { ColDef, ICellRendererParams } from 'ag-grid-community';
+import { ColDef, ICellRendererParams, SideBarDef } from 'ag-grid-community';
 import { combineLatest, map, Observable } from 'rxjs';
 import { HeroService } from '../../services/hero.service';
 import { ItemPopularityService } from '../../services/item-popularity.service';
@@ -11,7 +10,7 @@ import { Item } from '../../types/item.type';
 
 @Component({
   selector: 'app-heroes',
-  imports: [AsyncPipe, AgGridAngular],
+  imports: [AgGridAngular],
   providers: [],
   templateUrl: './heroes.component.html',
   styleUrl: './heroes.component.scss',
@@ -24,47 +23,83 @@ export class HeroesComponent implements OnInit {
   public itemNames$: Observable<{ [name: string]: Item }>;
   public mappedItemNames: { [name: string]: Item } = {};
 
-  rowData: {
+  public defaultColDef: ColDef = {
+    editable: true,
+    filter: true,
+    enablePivot: true,
+    enableRowGroup: true,
+    enableValue: true,
+  };
+
+  public pagination = true;
+  public paginationPageSize = 10;
+  public paginationPageSizeSelector = [10, 25, 50, 100];
+
+  public rowData: {
     hero: string;
+    winRate: number;
     startingItems: { key: string; value: number; item: Item }[];
     earlyItems: { key: string; value: number; item: Item }[];
     midItems: { key: string; value: number; item: Item }[];
     lateItems: { key: string; value: number; item: Item }[];
   }[] = [];
 
-  colDefs: ColDef[] = [
-    { field: 'hero', headerName: 'Hero', width: 150 },
+  public colDefs: ColDef[] = [
+    { field: 'hero', headerName: 'Hero', width: 150, filter: true },
+    {
+      field: 'winRate',
+      headerName: 'Win Rate',
+      valueFormatter: (params) => `${params.value} %`,
+      width: 150,
+      filter: true,
+    },
     {
       field: 'startingItems',
       headerName: 'Starting Items',
       cellRenderer: this.itemCellRenderer.bind(this),
-      flex: 1,
+      width: 210,
       autoHeight: true,
+      filter: false,
+      cellStyle: {
+        display: 'flex',
+      },
     },
     {
       field: 'earlyItems',
       headerName: 'Early Game Items',
       cellRenderer: this.itemCellRenderer.bind(this),
-      flex: 1,
+      width: 210,
+      filter: false,
       autoHeight: true,
+      cellStyle: {
+        display: 'flex',
+      },
     },
     {
       field: 'midItems',
       headerName: 'Mid Game Items',
+      filter: false,
       cellRenderer: this.itemCellRenderer.bind(this),
-      flex: 1,
+      width: 210,
       autoHeight: true,
+      cellStyle: {
+        display: 'flex',
+      },
     },
     {
       field: 'lateItems',
       headerName: 'Late Game Items',
+      filter: false,
       cellRenderer: this.itemCellRenderer.bind(this),
-      flex: 1,
+      width: 210,
       autoHeight: true,
+      cellStyle: {
+        display: 'flex',
+      },
     },
   ];
 
-  public imgUrl = 'https://cdn.cloudflare.steamstatic.com';
+  private imgUrl = 'https://cdn.cloudflare.steamstatic.com';
   constructor(
     private readonly heroesService: HeroService,
     private readonly itemPopularityService: ItemPopularityService
@@ -78,14 +113,18 @@ export class HeroesComponent implements OnInit {
   ngOnInit(): void {
     this.itemNames$.subscribe((itemNames) => {
       this.mappedItemNames = itemNames;
-      console.log(itemNames);
 
-      this.itemPopularity$
+      combineLatest([this.itemPopularity$, this.heroes$])
         .pipe(
-          map((itemPopularity) => {
-            return itemPopularity.map((item) => {
+          map(([itemPopularities, heroes]) => {
+            const heroMap = new Map(heroes.map((hero) => [hero.id, hero]));
+
+            return itemPopularities.map((item) => {
+              const hero = heroMap.get(item.hero.id);
+
               return {
                 hero: item.hero.localizedName,
+                winRate: hero?.winRate || 0,
                 startingItems: this.getItemEntries(item.startGameItems),
                 earlyItems: this.getItemEntries(item.earlyGameItems),
                 midItems: this.getItemEntries(item.midGameItems),
@@ -111,7 +150,7 @@ export class HeroesComponent implements OnInit {
       if (itemObj?.item?.img) {
         html += `
           <div class="item-entry">
-            <img src="${this.imgUrl}${itemObj.item.img}" alt="${itemObj.item.dname}" width="40" height="30" />
+            <img src="${this.imgUrl}${itemObj.item.img}" alt="${itemObj.item.dname}" width="35" height="23" />
             <div class="item-details">
             </div>
           </div>

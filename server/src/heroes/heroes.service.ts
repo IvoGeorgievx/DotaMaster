@@ -7,7 +7,7 @@ import { API_URL } from 'src/constants/api-url';
 import { ItemPopularity } from 'src/item-popularity/entities/item-popularity.entity';
 import { Repository } from 'typeorm';
 import { Hero } from './entities/hero.entity';
-import { chunk, sum } from 'lodash';
+import { ceil, chunk, sum } from 'lodash';
 
 interface IApiResponseHero {
   id: number;
@@ -64,10 +64,16 @@ export class HeroesService {
       this.http.get<IApiResponseHero[]>(`${API_URL}/heroes`),
     );
     const { data: winRate } = await firstValueFrom(
-      this.http.get<HeroStatsFromApi>(`${API_URL}/heroStats`),
+      this.http.get<HeroStatsFromApi[]>(`${API_URL}/heroStats`),
     );
 
     const heroes: Hero[] = data.map((hero) => {
+      const winRateHero = winRate.find((h) => h.id === hero.id);
+      const winPercantage = ceil(
+        (sum(winRateHero?.pub_win_trend) / sum(winRateHero?.pub_pick_trend)) *
+          100,
+        1,
+      );
       return {
         id: hero.id,
         name: hero.name,
@@ -76,8 +82,7 @@ export class HeroesService {
         attackType: hero.attack_type,
         roles: hero.roles,
         legs: hero.legs,
-        winRate: 1,
-        // need to figure out how to add the win percantage
+        winRate: winPercantage,
         updatedAt: new Date(),
       };
     });
@@ -95,7 +100,6 @@ export class HeroesService {
   }
 
   async clearAllHeroes(): Promise<void> {
-    await new Promise((resolve) => resolve(''));
     // await this.itemPopularityRepo.clear();
     // await this.heroRepo.clear();
   }
